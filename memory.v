@@ -1,24 +1,36 @@
-module harmonica_memory(
-    input wire [12:0] address,
-    input wire [2:0] swar_select,
-    output reg [7:0] data_out
+module note_selector (
+    input wire [3:0] note,
+    output reg [31:0] div_value
 );
-    reg [7:0] mem [0:55999];
 
-    initial begin
-        $readmemh("all_swars.hex", mem);
-    end
+    parameter CLK_FREQ = 100_000_000;
+    parameter FREQ_C = 261;
+    parameter FREQ_D = 294;
+    parameter FREQ_E = 329;
+    parameter FREQ_F = 349;
+    parameter FREQ_G = 392;
+    parameter FREQ_A = 440;
+    parameter FREQ_B = 493;
+
+    localparam CNT_C = CLK_FREQ / (2 * FREQ_C);
+    localparam CNT_D = CLK_FREQ / (2 * FREQ_D);
+    localparam CNT_E = CLK_FREQ / (2 * FREQ_E);
+    localparam CNT_F = CLK_FREQ / (2 * FREQ_F);
+    localparam CNT_G = CLK_FREQ / (2 * FREQ_G);
+    localparam CNT_A = CLK_FREQ / (2 * FREQ_A);
+    localparam CNT_B = CLK_FREQ / (2 * FREQ_B);
 
     always @(*) begin
-        case (swar_select)
-            3'b000: data_out = mem[address];
-            3'b001: data_out = mem[address + 8000];
-            3'b010: data_out = mem[address + 16000];
-            3'b011: data_out = mem[address + 24000];
-            3'b100: data_out = mem[address + 32000];
-            3'b101: data_out = mem[address + 40000];
-            3'b110: data_out = mem[address + 48000];
-            default: data_out = 8'b0;
+        case (note)
+            4'b0000: div_value = CNT_C;
+            4'b0001: div_value = CNT_D;
+            4'b0010: div_value = CNT_E;
+            4'b0011: div_value = CNT_F;
+            4'b0100: div_value = CNT_G;
+            4'b0101: div_value = CNT_A;
+            4'b0110: div_value = CNT_B;
+            default: div_value = CNT_C;
         endcase
     end
+
 endmodule
